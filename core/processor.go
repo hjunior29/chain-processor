@@ -23,8 +23,7 @@ func Processor(tx []models.Transaction) error {
 				return err
 			}
 
-			
-
+			// Send Notification
 		}
 	}
 	return nil

@@ -5,6 +5,7 @@ import (
 
 	"github.com/hjunior29/chain-processor/db"
 	"github.com/hjunior29/chain-processor/models"
+	"github.com/hjunior29/chain-processor/sender"
 	"gorm.io/gorm"
 )
 
@@ -17,13 +18,18 @@ func Processor(tx []models.Transaction) error {
 				if err := db.SaveValidProduct(db.DB, tx.BlockNumber, tx.TimeStamp, tx.Hash, tx.MethodId, tx.FunctionName); err != nil {
 					return err
 				}
+				
+				if err := sender.Whatsapp(); err != nil{
+					if err := db.SaveLog(db.DB, err, "Failed to send message via Whatsapp"); err != nil {
+						return err
+					}
+				}
 			}
 
 			if err := db.SaveLog(db.DB, nil, "The transaction: " + tx.Hash + " has createProduct: " + tx.BlockNumber); err != nil {
 				return err
 			}
 
-			// Send Notification
 		}
 	}
 	return nil

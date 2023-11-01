@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: database
+    image: "postgres:13"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}     
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data  
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "54321:80"
+    depends_on:
+      - db
+    
+  chain-processor:
+    build: .
+    environment:
+      DOCKER_ENV: true
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_SSLMODE: ${DB_SSLMODE}
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
